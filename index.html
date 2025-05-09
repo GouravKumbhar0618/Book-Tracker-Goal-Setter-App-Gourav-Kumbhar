@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Reading Tracker & Goal Setter</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <style>
+      :root {
+        --primary-color: #4e73df;
+        --secondary-color: #f8f9fc;
+        --accent-color: #2e59d9;
+        --text-color: #5a5c69;
+        --light-color: #ffffff;
+        --dark-color: #2c3e50;
+      }
+
+      body {
+        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        /* background-image: url("https://tse4.mm.bing.net/th?id=OIP.B4cHRCyKQ2Nol2pNrLGWGwHaGC&pid=Api&P=0&h=220");
+          background-repeat:round; */
+      }
+
+      .navbar-brand {
+        font-weight: 800;
+        font-size: 1.5rem;
+      }
+
+      .navbar {
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        background-color: var(--light-color);
+      }
+
+      .card {
+        border: none;
+        border-radius: 0.35rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        margin-bottom: 1.5rem;
+      }
+
+      .card-header {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 700;
+        border-bottom: none;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+      }
+
+      .status-badge {
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 700;
+        border-radius: 0.25rem;
+      }
+
+      .status-not-started {
+        background-color: #f8f9fa;
+        color: #6c757d;
+      }
+
+      .status-in-progress {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+
+      .status-completed {
+        background-color: #d4edda;
+        color: #155724;
+      }
+
+      .quote-container {
+        background-color: rgba(78, 115, 223, 0.1);
+        border-left: 5px solid var(--primary-color);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        font-style: italic;
+      }
+
+      .timer-display {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin: 1rem 0;
+      }
+
+      .timer-controls {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .progress {
+        height: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .book-cover {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 0.25rem;
+      }
+
+      .session-table th {
+        background-color: var(--secondary-color);
+      }
+
+      .action-buttons .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      @media (max-width: 768px) {
+        .timer-display {
+          font-size: 1.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top mb-4">
+      <div class="container-fluid">
+        <a class="navbar-brand text-primary" href="#">
+          <i class="bi bi-book me-2"></i>Book Tracker & Goal Setter App
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <span class="nav-link" id="current-time"></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+          <!-- Reading Session Form -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="bi bi-journal-plus me-2"></i>Add Reading Session
+            </div>
+            <div class="card-body">
+              <form id="readingSessionForm">
+                <input type="hidden" id="sessionId" />
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="bookTitle" class="form-label">Book Title</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="bookTitle"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="author" class="form-label">Author</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="author"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="pagesRead" class="form-label">Pages Read</label>
+                    <input type="number" class="form-control" id="pagesRead" />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="totalPages" class="form-label"
+                      >Total Pages</label
+                    >
+                    <input type="number" class="form-control" id="totalPages" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="readingDate" class="form-label"
+                      >Reading Date</label
+                    >
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="readingDate"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" required>
+                      <option value="Not Started">Not Started</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="notes" class="form-label">Notes</label>
+                  <textarea class="form-control" id="notes" rows="3"></textarea>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <button
+                    type="button"
+                    class="btn btn-secondary me-2"
+                    id="cancelBtn"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" class="btn btn-primary" id="saveBtn">
+                    Save Session
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Reading Sessions Table -->
+          <div class="card mb-4">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <div><i class="bi bi-list-task me-2"></i>Reading Sessions</div>
+              <div>
+                <button
+                  class="btn btn-sm btn-outline-primary me-2"
+                  id="exportPdfBtn"
+                  style="color: white; background-color: red"
+                >
+                  <i class="bi bi-file-earmark-pdf" style="color: white"></i>
+                  PDF
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-success"
+                  id="exportCsvBtn"
+                  style="color: white; background-color: green"
+                >
+                  <i class="bi bi-file-earmark-excel" style="color: white"></i>
+                  CSV
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover session-table">
+                  <thead>
+                    <tr>
+                      <th>Book</th>
+                      <th>Author</th>
+                      <th>Pages</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sessionsTableBody">
+                    <!-- Sessions will be added here dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+          <!-- Reading Timer -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="bi bi-stopwatch me-2"></i>Reading Timer
+            </div>
+            <div class="card-body">
+              <div class="timer-display" id="timerDisplay">00:00:00</div>
+              <div class="timer-controls">
+                <button class="btn btn-success" id="startTimerBtn">
+                  <i class="bi bi-play-fill"></i> Start
+                </button>
+                <button class="btn btn-danger" id="stopTimerBtn" disabled>
+                  <i class="bi bi-stop-fill"></i> Stop
+                </button>
+                <button class="btn btn-warning" id="resetTimerBtn">
+                  <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+              </div>
+              <div class="mb-3">
+                <label for="timerGoal" class="form-label"
+                  >Set Reading Goal (minutes)</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="timerGoal"
+                  value="30"
+                  min="1"
+                />
+              </div>
+              <div class="progress">
+                <div
+                  id="timerProgress"
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <div class="text-center">
+                <small class="text-muted" id="timerGoalText"
+                  >Goal: 30 minutes (0% completed)</small
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Motivational Quote
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-chat-quote me-2"></i>Today's Motivation
+                    </div>
+                    <div class="card-body">
+                        <div class="quote-container">
+                            <p id="motivationalQuote">Loading quote...</p>
+                            <p class="text-end fw-bold" id="quoteAuthor"></p>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary" id="newQuoteBtn">
+                            <i class="bi bi-arrow-repeat"></i> New Quote
+                        </button>
+                    </div>
+                </div> -->
+          <!-- ---------------------------------------------------------------------------------------------------------------------- -->
+          <!-- Updated Motivational Quote HTML & JS Code -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="bi bi-chat-quote me-2"></i>Today's Motivation
+            </div>
+            <div class="card-body">
+              <div class="quote-container">
+                <p id="motivationalQuote">Loading quote...</p>
+                <p class="text-end fw-bold" id="quoteAuthor"></p>
+              </div>
+              <button
+                class="btn btn-sm btn-outline-primary mt-3"
+                id="newQuoteBtn"
+              >
+                <i class="bi bi-arrow-repeat"></i> New Quote
+              </button>
+            </div>
+          </div>
+
+          <script>
+            const quotes = [
+              {
+                text: "Believe you can and you're halfway there.",
+                author: "Theodore Roosevelt",
+              },
+              {
+                text: "Your time is limited, so don't waste it living someone else's life.",
+                author: "Steve Jobs",
+              },
+              {
+                text: "Push yourself, because no one else is going to do it for you.",
+                author: "Les Brown",
+              },
+              {
+                text: "Success doesn’t just find you. You have to go out and get it.",
+                author: "T. Scott McLeod",
+              },
+              {
+                text: "Great things never come from comfort zones.",
+                author: "Ginni Rometty",
+              },
+              { text: "Dream it. Wish it. Do it.", author: "Debbie Allen" },
+              {
+                text: "Stay focused and never give up.",
+                author: "Julie Andrews",
+              },
+              {
+                text: "Don’t stop when you’re tired. Stop when you’re done.",
+                author: "Marilyn Monroe",
+              },
+              {
+                text: "Wake up with determination. Go to bed with satisfaction.",
+                author: "George Lorimer",
+              },
+              {
+                text: "Do something today that your future self will thank you for.",
+                author: "Sean Patrick Flanery",
+              },
+              { text: "Little things make big days.", author: "Isabel Marant" },
+              {
+                text: "It always seems impossible until it’s done.",
+                author: "Nelson Mandela",
+              },
+              {
+                text: "Success is what comes after you stop making excuses.",
+                author: "Luis Galarza",
+              },
+              {
+                text: "Don’t watch the clock; do what it does. Keep going.",
+                author: "Sam Levenson",
+              },
+              {
+                text: "Sometimes later becomes never. Do it now.",
+                author: "Cecelia Ahern",
+              },
+              { text: "Only the paranoid survive.", author: "Andy Grove" },
+              {
+                text: "If you can dream it, you can do it.",
+                author: "Walt Disney",
+              },
+              {
+                text: "Hard work beats talent when talent doesn’t work hard.",
+                author: "Tim Notke",
+              },
+              {
+                text: "Act as if what you do makes a difference. It does.",
+                author: "William James",
+              },
+              {
+                text: "Start where you are. Use what you have. Do what you can.",
+                author: "Arthur Ashe",
+              },
+            ];
+
+            let currentIndex = 0;
+
+            function displayQuote(index) {
+              const quote = quotes[index];
+              document.getElementById(
+                "motivationalQuote"
+              ).textContent = `"${quote.text}"`;
+              document.getElementById(
+                "quoteAuthor"
+              ).textContent = `- ${quote.author}`;
+            }
+
+            function showNextQuote() {
+              currentIndex = (currentIndex + 1) % quotes.length;
+              displayQuote(currentIndex);
+            }
+
+            document
+              .getElementById("newQuoteBtn")
+              .addEventListener("click", showNextQuote);
+
+            // Automatically cycle every 7 seconds
+            setInterval(showNextQuote, 5000);
+
+            // Show the first quote on page load
+            window.onload = function () {
+              displayQuote(currentIndex);
+            };
+          </script>
+          <!-- ---------------------------------------------------------------------------------------------------------------------- -->
+
+          <!-- Reading Stats -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="bi bi-bar-chart me-2"></i>Reading Statistics
+            </div>
+            <div class="card-body">
+              <div class="row text-center">
+                <div class="col-4">
+                  <h5 id="totalBooks">0</h5>
+                  <small class="text-muted">Books</small>
+                </div>
+                <div class="col-4">
+                  <h5 id="totalPages">0</h5>
+                  <small class="text-muted">Pages</small>
+                </div>
+                <div class="col-4">
+                  <h5 id="completedBooks">0</h5>
+                  <small class="text-muted">Completed</small>
+                </div>
+              </div>
+              <canvas id="readingChart" class="mt-3" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Details Modal -->
+    <div
+      class="modal fade"
+      id="sessionDetailsModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalBookTitle"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <p><strong>Author:</strong> <span id="modalAuthor"></span></p>
+                <p><strong>Date:</strong> <span id="modalDate"></span></p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Pages:</strong> <span id="modalPages"></span></p>
+                <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+              </div>
+            </div>
+            <div class="mb-3">
+              <strong>Notes:</strong>
+              <p id="modalNotes" class="mt-2"></p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script>
+      // Wait for DOM to be fully loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize variables
+        let sessions =
+          JSON.parse(localStorage.getItem("readingSessions")) || [];
+        let timerInterval;
+        let seconds = 0;
+        let isTimerRunning = false;
+        let timerGoal = 30; // Default goal in minutes
+        const { jsPDF } = window.jspdf;
+
+        // DOM elements
+        const form = document.getElementById("readingSessionForm");
+        const sessionsTableBody = document.getElementById("sessionsTableBody");
+        const timerDisplay = document.getElementById("timerDisplay");
+        const startTimerBtn = document.getElementById("startTimerBtn");
+        const stopTimerBtn = document.getElementById("stopTimerBtn");
+        const resetTimerBtn = document.getElementById("resetTimerBtn");
+        const timerGoalInput = document.getElementById("timerGoal");
+        const timerProgress = document.getElementById("timerProgress");
+        const timerGoalText = document.getElementById("timerGoalText");
+        const currentTimeElement = document.getElementById("current-time");
+        const motivationalQuote = document.getElementById("motivationalQuote");
+        const quoteAuthor = document.getElementById("quoteAuthor");
+        const newQuoteBtn = document.getElementById("newQuoteBtn");
+        const exportPdfBtn = document.getElementById("exportPdfBtn");
+        const exportCsvBtn = document.getElementById("exportCsvBtn");
+        const cancelBtn = document.getElementById("cancelBtn");
+        const totalBooksElement = document.getElementById("totalBooks");
+        const totalPagesElement = document.getElementById("totalPages");
+        const completedBooksElement = document.getElementById("completedBooks");
+        const sessionDetailsModal = new bootstrap.Modal(
+          document.getElementById("sessionDetailsModal")
+        );
+
+        // Initialize Chart
+        let readingChart;
+        initChart();
+
+        // Set current date as default
+        document.getElementById("readingDate").valueAsDate = new Date();
+
+        // Update clock every second
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Load motivational quote
+        fetchMotivationalQuote();
+
+        // Load sessions
+        renderSessions();
+        updateStats();
+
+        // Event listeners
+        form.addEventListener("submit", handleFormSubmit);
+        startTimerBtn.addEventListener("click", startTimer);
+        stopTimerBtn.addEventListener("click", stopTimer);
+        resetTimerBtn.addEventListener("click", resetTimer);
+        timerGoalInput.addEventListener("change", updateTimerGoal);
+        newQuoteBtn.addEventListener("click", fetchMotivationalQuote);
+        exportPdfBtn.addEventListener("click", exportToPdf);
+        exportCsvBtn.addEventListener("click", exportToCsv);
+        cancelBtn.addEventListener("click", resetForm);
+
+        // Functions
+        function updateClock() {
+          const now = new Date();
+          currentTimeElement.textContent =
+            now.toLocaleTimeString() + " | " + now.toLocaleDateString();
+        }
+
+        function handleFormSubmit(e) {
+          e.preventDefault();
+
+          const sessionId = document.getElementById("sessionId").value;
+          const bookTitle = document.getElementById("bookTitle").value.trim();
+          const author = document.getElementById("author").value.trim();
+          const pagesRead =
+            parseInt(document.getElementById("pagesRead").value) || 0;
+          const totalPages =
+            parseInt(document.getElementById("totalPages").value) || 0;
+          const readingDate = document.getElementById("readingDate").value;
+          const status = document.getElementById("status").value;
+          const notes = document.getElementById("notes").value.trim();
+
+          const session = {
+            id: sessionId || Date.now().toString(),
+            bookTitle,
+            author,
+            pagesRead,
+            totalPages,
+            readingDate,
+            status,
+            notes,
+            createdAt: sessionId
+              ? sessions.find((s) => s.id === sessionId).createdAt
+              : new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+
+          if (sessionId) {
+            // Update existing session
+            const index = sessions.findIndex((s) => s.id === sessionId);
+            if (index !== -1) {
+              sessions[index] = session;
+            }
+          } else {
+            // Add new session
+            sessions.push(session);
+          }
+
+          // Save to localStorage
+          localStorage.setItem("readingSessions", JSON.stringify(sessions));
+
+          // Refresh UI
+          renderSessions();
+          updateStats();
+          resetForm();
+        }
+
+        function renderSessions() {
+          if (sessions.length === 0) {
+            sessionsTableBody.innerHTML =
+              '<tr><td colspan="6" class="text-center">No reading sessions yet. Add one to get started!</td></tr>';
+            return;
+          }
+
+          // Sort sessions by date (newest first)
+          sessions.sort(
+            (a, b) => new Date(b.readingDate) - new Date(a.readingDate)
+          );
+
+          sessionsTableBody.innerHTML = "";
+
+          sessions.forEach((session) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td>${session.bookTitle}</td>
+                        <td>${session.author}</td>
+                        <td>${session.pagesRead}/${
+              session.totalPages || "N/A"
+            }</td>
+                        <td>${formatDate(session.readingDate)}</td>
+                        <td><span class="status-badge status-${session.status
+                          .toLowerCase()
+                          .replace(" ", "-")}">${session.status}</span></td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-outline-primary view-btn" data-id="${
+                              session.id
+                            }" title="View">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success edit-btn" data-id="${
+                              session.id
+                            }" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${
+                              session.id
+                            }" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+            sessionsTableBody.appendChild(row);
+          });
+
+          // Add event listeners to action buttons
+          document.querySelectorAll(".view-btn").forEach((btn) => {
+            btn.addEventListener("click", viewSession);
+          });
+
+          document.querySelectorAll(".edit-btn").forEach((btn) => {
+            btn.addEventListener("click", editSession);
+          });
+
+          document.querySelectorAll(".delete-btn").forEach((btn) => {
+            btn.addEventListener("click", deleteSession);
+          });
+        }
+
+        function viewSession(e) {
+          const sessionId = e.currentTarget.getAttribute("data-id");
+          const session = sessions.find((s) => s.id === sessionId);
+
+          if (session) {
+            document.getElementById("modalBookTitle").textContent =
+              session.bookTitle;
+            document.getElementById("modalAuthor").textContent = session.author;
+            document.getElementById("modalDate").textContent = formatDate(
+              session.readingDate
+            );
+            document.getElementById("modalPages").textContent = `${
+              session.pagesRead
+            } of ${session.totalPages || "N/A"} pages`;
+            document.getElementById("modalStatus").textContent = session.status;
+            document.getElementById("modalNotes").textContent =
+              session.notes || "No notes available";
+
+            // Update status badge in modal
+            const statusBadge = document.getElementById("modalStatus");
+            statusBadge.className = "";
+            statusBadge.classList.add(
+              "status-badge",
+              `status-${session.status.toLowerCase().replace(" ", "-")}`
+            );
+
+            sessionDetailsModal.show();
+          }
+        }
+
+        function editSession(e) {
+          const sessionId = e.currentTarget.getAttribute("data-id");
+          const session = sessions.find((s) => s.id === sessionId);
+
+          if (session) {
+            document.getElementById("sessionId").value = session.id;
+            document.getElementById("bookTitle").value = session.bookTitle;
+            document.getElementById("author").value = session.author;
+            document.getElementById("pagesRead").value = session.pagesRead;
+            document.getElementById("totalPages").value = session.totalPages;
+            document.getElementById("readingDate").value = session.readingDate;
+            document.getElementById("status").value = session.status;
+            document.getElementById("notes").value = session.notes;
+
+            // Scroll to form
+            document
+              .getElementById("readingSessionForm")
+              .scrollIntoView({ behavior: "smooth" });
+          }
+        }
+
+        function deleteSession(e) {
+          if (
+            confirm("Are you sure you want to delete this reading session?")
+          ) {
+            const sessionId = e.currentTarget.getAttribute("data-id");
+            sessions = sessions.filter((s) => s.id !== sessionId);
+            localStorage.setItem("readingSessions", JSON.stringify(sessions));
+            renderSessions();
+            updateStats();
+          }
+        }
+
+        function resetForm() {
+          form.reset();
+          document.getElementById("sessionId").value = "";
+          document.getElementById("readingDate").valueAsDate = new Date();
+        }
+
+        function formatDate(dateString) {
+          const options = { year: "numeric", month: "short", day: "numeric" };
+          return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        function startTimer() {
+          if (!isTimerRunning) {
+            isTimerRunning = true;
+            startTimerBtn.disabled = true;
+            stopTimerBtn.disabled = false;
+
+            timerInterval = setInterval(() => {
+              seconds++;
+              updateTimerDisplay();
+
+              // Update progress
+              const goalSeconds = timerGoal * 60;
+              const progress = Math.min((seconds / goalSeconds) * 100, 100);
+              timerProgress.style.width = `${progress}%`;
+              timerGoalText.textContent = `Goal: ${timerGoal} minutes (${Math.round(
+                progress
+              )}% completed)`;
+
+              if (seconds >= goalSeconds) {
+                timerProgress.classList.remove("progress-bar-animated");
+                timerProgress.classList.remove("progress-bar-striped");
+                timerProgress.classList.add("bg-success");
+                stopTimer();
+
+                // Show congratulatory message
+                alert(
+                  `Congratulations! You've reached your ${timerGoal}-minute reading goal!`
+                );
+              }
+            }, 1000);
+          }
+        }
+
+        function stopTimer() {
+          if (isTimerRunning) {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            startTimerBtn.disabled = false;
+            stopTimerBtn.disabled = true;
+          }
+        }
+
+        function resetTimer() {
+          stopTimer();
+          seconds = 0;
+          updateTimerDisplay();
+          timerProgress.style.width = "0%";
+          timerProgress.classList.remove("bg-success");
+          timerProgress.classList.add(
+            "progress-bar-animated",
+            "progress-bar-striped"
+          );
+          timerGoalText.textContent = `Goal: ${timerGoal} minutes (0% completed)`;
+        }
+
+        function updateTimerDisplay() {
+          const hours = Math.floor(seconds / 3600);
+          const minutes = Math.floor((seconds % 3600) / 60);
+          const secs = seconds % 60;
+
+          timerDisplay.textContent = `${hours
+            .toString()
+            .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs
+            .toString()
+            .padStart(2, "0")}`;
+        }
+
+        function updateTimerGoal() {
+          timerGoal = parseInt(timerGoalInput.value) || 30;
+          timerGoalText.textContent = `Goal: ${timerGoal} minutes (${Math.round(
+            (seconds / (timerGoal * 60)) * 100
+          )}% completed)`;
+        }
+
+        async function fetchMotivationalQuote() {
+          try {
+            motivationalQuote.textContent = "Loading quote...";
+            quoteAuthor.textContent = "";
+
+            const response = await fetch("https://type.fit/api/quotes");
+            const quotes = await response.json();
+            const filteredQuotes = quotes.filter(
+              (q) =>
+                q.text.toLowerCase().includes("read") ||
+                q.text.toLowerCase().includes("book") ||
+                q.text.toLowerCase().includes("learn") ||
+                q.text.toLowerCase().includes("knowledge")
+            );
+
+            const randomQuote =
+              filteredQuotes.length > 0
+                ? filteredQuotes[
+                    Math.floor(Math.random() * filteredQuotes.length)
+                  ]
+                : quotes[Math.floor(Math.random() * quotes.length)];
+
+            motivationalQuote.textContent = randomQuote.text;
+            quoteAuthor.textContent = randomQuote.author || "Unknown";
+          } catch (error) {
+            console.error("Error fetching quote:", error);
+            motivationalQuote.textContent =
+              "The more that you read, the more things you will know. The more that you learn, the more places you'll go.";
+            quoteAuthor.textContent = "Dr. Seuss";
+          }
+        }
+
+        function exportToPdf() {
+          const doc = new jsPDF();
+
+          // Add title
+          doc.setFontSize(18);
+          doc.text("My Reading Sessions", 105, 15, { align: "center" });
+
+          // Add date
+          doc.setFontSize(10);
+          doc.text(
+            `Generated on: ${new Date().toLocaleDateString()}`,
+            105,
+            22,
+            { align: "center" }
+          );
+
+          // Prepare data for table
+          const tableData = sessions.map((session) => [
+            session.bookTitle,
+            session.author,
+            `${session.pagesRead}/${session.totalPages || "N/A"}`,
+            formatDate(session.readingDate),
+            session.status,
+          ]);
+
+          // Add table
+          doc.autoTable({
+            head: [["Book Title", "Author", "Pages", "Date", "Status"]],
+            body: tableData,
+            startY: 30,
+            styles: {
+              fontSize: 8,
+              cellPadding: 2,
+              valign: "middle",
+            },
+            headStyles: {
+              fillColor: [78, 115, 223],
+              textColor: 255,
+              fontStyle: "bold",
+            },
+            alternateRowStyles: {
+              fillColor: [240, 240, 240],
+            },
+          });
+
+          // Add statistics
+          const statsY = doc.lastAutoTable.finalY + 10;
+          doc.setFontSize(12);
+          doc.text("Reading Statistics", 14, statsY);
+
+          const completedCount = sessions.filter(
+            (s) => s.status === "Completed"
+          ).length;
+          const totalPagesRead = sessions.reduce(
+            (sum, s) => sum + (s.pagesRead || 0),
+            0
+          );
+
+          doc.setFontSize(10);
+          doc.text(`Total Books: ${sessions.length}`, 14, statsY + 8);
+          doc.text(`Completed Books: ${completedCount}`, 14, statsY + 16);
+          doc.text(`Total Pages Read: ${totalPagesRead}`, 14, statsY + 24);
+
+          // Save the PDF
+          doc.save("Reading_Sessions_Report.pdf");
+        }
+
+        function exportToCsv() {
+          if (sessions.length === 0) {
+            alert("No sessions to export");
+            return;
+          }
+
+          // CSV header
+          let csv =
+            "Book Title,Author,Pages Read,Total Pages,Reading Date,Status,Notes\n";
+
+          // Add each session as a row
+          sessions.forEach((session) => {
+            csv += `"${session.bookTitle}","${session.author}",${
+              session.pagesRead
+            },${session.totalPages || ""},"${formatDate(
+              session.readingDate
+            )}","${session.status}","${session.notes.replace(/"/g, '""')}"\n`;
+          });
+
+          // Create download link
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.setAttribute("href", url);
+          link.setAttribute("download", "reading_sessions.csv");
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+
+        function updateStats() {
+          const completedCount = sessions.filter(
+            (s) => s.status === "Completed"
+          ).length;
+          const totalPagesRead = sessions.reduce(
+            (sum, s) => sum + (s.pagesRead || 0),
+            0
+          );
+
+          totalBooksElement.textContent = sessions.length;
+          completedBooksElement.textContent = completedCount;
+          totalPagesElement.textContent = totalPagesRead;
+
+          updateChart();
+        }
+
+        function initChart() {
+          const ctx = document.getElementById("readingChart").getContext("2d");
+
+          readingChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: ["Not Started", "In Progress", "Completed"],
+              datasets: [
+                {
+                  label: "Books by Status",
+                  data: [0, 0, 0],
+                  backgroundColor: [
+                    "rgba(108, 117, 125, 0.7)",
+                    "rgba(255, 193, 7, 0.7)",
+                    "rgba(40, 167, 69, 0.7)",
+                  ],
+                  borderColor: [
+                    "rgba(108, 117, 125, 1)",
+                    "rgba(255, 193, 7, 1)",
+                    "rgba(40, 167, 69, 1)",
+                  ],
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                  },
+                },
+              },
+            },
+          });
+
+          updateChart();
+        }
+
+        function updateChart() {
+          if (!readingChart) return;
+
+          const notStarted = sessions.filter(
+            (s) => s.status === "Not Started"
+          ).length;
+          const inProgress = sessions.filter(
+            (s) => s.status === "In Progress"
+          ).length;
+          const completed = sessions.filter(
+            (s) => s.status === "Completed"
+          ).length;
+
+          readingChart.data.datasets[0].data = [
+            notStarted,
+            inProgress,
+            completed,
+          ];
+          readingChart.update();
+        }
+      });
+    </script>
+  </body>
+</html>
